@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consulta de Localização</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+            background-color: #a7c7e7; /* Cor de fundo azul suave */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        .container {
+            background-color: #ffffff;
+            padding: 30px 40px;
+            border-radius: 10px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            color: #333333;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        /* Estilo para o mapa */
+        #map {
+            height: 400px;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .resultado {
+            margin-top: 20px;
+            text-align: left;
+            color: #333;
+        }
+
+        .erro {
+            margin-top: 20px;
+            color: red;
+        }
+    </style>
+
+    <!-- Incluindo o CSS e JS do Leaflet -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Consulta de Localização</h1>
+
+        <!-- Formulário de entrada -->
+        <form method="POST">
+            <label for="location">Digite a localização:</label>
+            <input type="text" name="location" id="location" required>
+            <button type="submit">Gerar Mapa</button>
+        </form>
+
+        {% if lat and lon %}
+            <div class="resultado">
+                <h2>Resultado:</h2>
+                <p><strong>Latitude:</strong> {{ lat }}</p>
+                <p><strong>Longitude:</strong> {{ lon }}</p>
+                <p><strong>Localização:</strong> {{ location }}</p>
+
+                <!-- Adicionando o mapa -->
+                <div id="map"></div>
+
+                <script>
+                    // Criando o mapa com Leaflet
+                    var map = L.map('map').setView([{{ lat }}, {{ lon }}], 13); // Define o centro do mapa e o zoom
+
+                    // Adicionando o mapa com tiles do OpenStreetMap
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                    }).addTo(map);
+
+                    // Adicionando um marcador no ponto de latitude e longitude
+                    L.marker([{{ lat }}, {{ lon }}]).addTo(map)
+                        .bindPopup("<b>Localização</b><br>{{ location }}")
+                        .openPopup();
+                </script>
+            </div>
+        {% elif error %}
+            <p class="erro">{{ error }}</p>
+        {% endif %}
+    </div>
+</body>
+</html>
